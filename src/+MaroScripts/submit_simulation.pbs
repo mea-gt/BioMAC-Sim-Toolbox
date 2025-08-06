@@ -1,0 +1,22 @@
+#!/bin/bash -l
+#
+# allocate 1 node (4 CPUs) for 8 hours
+#PBS -l nodes=1:ppn=4,walltime=08:00:00
+#
+# job name 
+#PBS -N ${INPUT1}_${INPUT2}_${INPUT3}
+#
+# first non-empty non-comment line ends PBS options
+
+# load module (check Matlab versions with "module avail")
+module load matlab/R2023b
+
+# build matlab code which should be called
+WORKDIR="'~/OptCntrlSims/BioMAC-Sim-Toolbox/'"
+PATHIPOPT="'~/IPOPT-toolbox/'"
+FUNCTION="MaroScripts.scriptCODfromMeasIMU"
+MATLABCODE="addpath(genpath(${PATHIPOPT})); addpath(genpath(${WORKDIR})); ${FUNCTION}(${WORKDIR}, '${INPUT1}', '${INPUT2}', '${INPUT3}'); quit;"
+echo ${MATLABCODE}
+
+# submit job
+matlab -nojvm -nodisplay -nosplash -r "${MATLABCODE}"

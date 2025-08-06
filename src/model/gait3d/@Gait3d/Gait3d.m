@@ -944,9 +944,15 @@ classdef Gait3d < Model
                     torques.name = [];
                     obj.torques = torques;
                 case {'3D Gait Model with Simple Arms and Pelvis Rotation-Obliquity-Tilt Sequence', ...
-                        '3DGaitModelwithSimpleArmsandPelvisRotation-Obliquity-TiltSequence', ...
-                        'Running Model For Motions In All Directions', ...
-                        'RunningModelForMotionsInAllDirections', 'scaled_model_1dof_s01', 'Catelli_high_hip_flexion'}
+                      '3DGaitModelwithSimpleArmsandPelvisRotation-Obliquity-TiltSequence', ...
+                      'Running Model For Motions In All Directions', ...
+                      'RunningModelForMotionsInAllDirections', 'scaled_model_1dof_s01', 'Catelli_high_hip_flexion',...
+                      'scaled_model_s01','scaled_model_s02','scaled_model_s03','scaled_model_s04',...
+                      'scaled_model_s05','scaled_model_s06','scaled_model_s07','scaled_model_s08',...
+                      'scaled_model_s09','scaled_model_s10','scaled_model_s11','scaled_model_s12',...
+                      'scaled_model_s13','scaled_model_s14','scaled_model_s15','scaled_model_s16',...
+                      'scaled_model_s17','scaled_model_s18','scaled_model_s19','scaled_model_s20',...
+                      'scaled_model_s21','scaled_model_s23'}
                     % gait3d_pelvis213 model
                     % (there are only torque actuators at the arms)
                     armdof_names = {'arm_flex_r','arm_add_r','arm_rot_r','elbow_flex_r','pro_sup_r','arm_flex_l','arm_add_l','arm_rot_l','elbow_flex_l','pro_sup_l'};
@@ -960,7 +966,7 @@ classdef Gait3d < Model
                     torques.name = [];
                     obj.torques = torques;
                 otherwise
-                    error('Model name in obj.sim.name not recognized.')
+                    error('Model name in obj.osim.name not recognized.')
             end
         end 
         
@@ -1047,12 +1053,16 @@ classdef Gait3d < Model
             end
             
             % load or compute moment arms
-            filename = strrep(obj.osim.file,'.osim','_momentarms.mat');
-            filename = strsplit(filename,{'/','\'});
-            filename = which(filename{end});
+            filename_full = strrep(obj.osim.file,'.osim','_momentarms.mat');
+            filename_parts = strsplit(filename_full,{'/','\'});
+            filename = which(filename_parts{end});
             if ~exist(filename, 'file')
                 disp('Momentarm file could not be found. Momentarms will be computed.')
                 obj.computeMomentArms(range_muscleMoment); % compute moment arms
+                filename = which(filename_parts{end}); %MEA: this line was added bc without it the following
+                % 'load(which(filename))' throws an error if filename was
+                % empty (which it would be since we have entered this
+                % if-statement)
             end
             load(which(filename),'momentarm_model','osim_sha256');
             if (osim_sha256 ~= obj.osim.sha256) & ~strcmp(computer,'MACA64') % OpenSim is not supported on Apple Silicon Mac
